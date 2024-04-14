@@ -1,7 +1,7 @@
 ame: 'Terraform'
  
 on:
-  types: [workflow_dispatch]
+  [workflow_dispatch]
  
 jobs:
   terraform:
