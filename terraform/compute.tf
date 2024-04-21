@@ -1,4 +1,4 @@
-resource "azurerm_orchestrated_virtual_machine_scale_set" "vmss_terraform_tutorial" {
+resource "azurerm_orchestrated_virtual_machine_scale_set" "vmss_terraform_tfm" {
   name                        = "vmss-terraform"
   resource_group_name         = azurerm_resource_group.rg.name
   location                    = azurerm_resource_group.rg.location
