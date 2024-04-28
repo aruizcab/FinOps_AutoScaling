@@ -14,7 +14,7 @@ resource "azurerm_orchestrated_virtual_machine_scale_set" "vmss_terraform_tfm" {
       admin_username                  = "azureuser"
       admin_ssh_key {
         username   = "azureuser"
-        public_key = file("~/.ssh/id_rsa.pub")
+        public_key = var.PUB_KEY
       }
     }
   }
