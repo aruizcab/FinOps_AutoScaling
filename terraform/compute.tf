@@ -26,7 +26,7 @@ resource "azurerm_orchestrated_virtual_machine_scale_set" "vmss_terraform_tfm" {
     version   = "latest"
   }
   os_disk {
-    storage_account_type = "Premium_LRS"
+    storage_account_type = "Standard_LRS"
     caching              = "ReadWrite"
   }
 
