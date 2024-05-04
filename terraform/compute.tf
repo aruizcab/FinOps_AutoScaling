@@ -1,8 +1,8 @@
-resource "azurerm_orchestrated_virtual_machine_scale_set" "vmss_terraform_tfm" {
+resource "azurerm_orchestrated_virtual_machine_scale_set" "vmss_terraform_tutorial" {
   name                        = "vmss-terraform"
   resource_group_name         = azurerm_resource_group.rg.name
   location                    = azurerm_resource_group.rg.location
-  sku_name                    = "Standard_D3_v2"
+  sku_name                    = "Standard_D2s_v4"
   instances                   = 3
   platform_fault_domain_count = 1     # For zonal deployments, this must be set to 1
   zones                       = ["1"] # Zones required to lookup zone in the startup script
@@ -14,7 +14,7 @@ resource "azurerm_orchestrated_virtual_machine_scale_set" "vmss_terraform_tfm" {
       admin_username                  = "azureuser"
       admin_ssh_key {
         username   = "azureuser"
-        public_key = var.PUB_KEY
+        public_key = file("~/.ssh/id_rsa.pub")
       }
     }
   }
@@ -26,7 +26,7 @@ resource "azurerm_orchestrated_virtual_machine_scale_set" "vmss_terraform_tfm" {
     version   = "latest"
   }
   os_disk {
-    storage_account_type = "Standard_LRS"
+    storage_account_type = "Premium_LRS"
     caching              = "ReadWrite"
   }
 
@@ -54,4 +54,3 @@ resource "azurerm_orchestrated_virtual_machine_scale_set" "vmss_terraform_tfm" {
     ]
   }
 }
-
