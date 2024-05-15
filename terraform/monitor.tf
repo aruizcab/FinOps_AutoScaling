@@ -1,7 +1,7 @@
 resource "azurerm_monitor_metric_alert" "vmss_cpu_alert" {
   name                = "vmss-cpu-alert"
   resource_group_name = azurerm_resource_group.rg.name
-  scopes              = [azurerm_linux_virtual_machine_scale_set.vmss.id]
+  scopes              = [azurerm_orchestrated_virtual_machine_scale_set.vmss_terraform_tfm.id]
   description         = "Alert when VMSS CPU usage exceeds 80%"
   severity            = 2
   enabled             = true
