@@ -5,7 +5,7 @@ resource "azurerm_monitor_metric_alert" "vmss_cpu_alert" {
   description         = "Alert when VMSS CPU usage exceeds 80%"
   severity            = 2
   enabled             = true
-  frequency           = "PT2M" # Evaluar cada 5 minutos
+  frequency           = "PT1M" # Evaluar cada 5 minutos
   window_size         = "PT5M" # Período de 1 minutos para calcular el promedio
 
   criteria {
