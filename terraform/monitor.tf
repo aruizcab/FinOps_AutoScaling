@@ -44,9 +44,9 @@ resource "azurerm_logic_app_action_http" "example" {
 }
 
 data "azapi_resource_action" "callback_url_data" {
-  type = "Microsoft.Web/sites/hostruntime/webhooks/api/workflows/triggers@2022-03-01"
-  action = "listCallbackUrl"
-  resource_id = azurerm_logic_app_workflow.example.id
+  type                   = "Microsoft.Web/sites/hostruntime/webhooks/api/workflows/triggers@2022-03-01"
+  action                 = "listCallbackUrl"
+  resource_id            = azurerm_logic_app_workflow.example.id
   response_export_values = ["*"]
 }
 
