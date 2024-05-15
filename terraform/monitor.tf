@@ -16,7 +16,7 @@ resource "azurerm_key_vault" "kv" {
 
 resource "azurerm_key_vault_secret" "github_token" {
   name         = "github-token"
-  value        = "${var.GH_TOKEN}"
+  value        = var.GH_TOKEN
   key_vault_id = azurerm_key_vault.kv.id
 }
 
