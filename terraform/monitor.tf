@@ -72,7 +72,7 @@ resource "azurerm_monitor_metric_alert" "vmss_cpu_alert" {
     metric_namespace = "Microsoft.Compute/virtualMachineScalesets"
     metric_name      = "Percentage CPU"
     aggregation      = "Average"
-    operator         = "LowerThan"
+    operator         = "LessThan"
     threshold        = 20
   }
 
