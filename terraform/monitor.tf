@@ -1,6 +1,4 @@
 # Key vault to store github token
-data "azurerm_client_config" "current" {}
-
 data "azurerm_key_vault_secret" "github_token" {
   name         = "github-token"
   key_vault_id = azurerm_key_vault.kv.id
