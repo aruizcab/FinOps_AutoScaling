@@ -15,6 +15,10 @@ terraform {
       source  = "hashicorp/random"
       version = "3.5.1"
     }
+
+    azapi = {
+      source = "Azure/azapi"
+    }
   }
 }
 
@@ -24,6 +28,9 @@ provider "azurerm" {
       prevent_deletion_if_contains_resources = false
     }
   }
+}
+
+provider "azapi" {
 }
 
 data "azurerm_client_config" "current" {}

@@ -25,6 +25,22 @@ resource "azurerm_logic_app_workflow" "example" {
   resource_group_name = azurerm_resource_group.rg.name
 }
 
+resource "azurerm_logic_app_trigger_http_request" "example" {
+  name         = "some-http-trigger"
+  logic_app_id = azurerm_logic_app_workflow.example.id
+
+  schema = <<SCHEMA
+{
+    "type": "object",
+    "properties": {
+        "hello": {
+            "type": "string"
+        }
+    }
+}
+SCHEMA
+}
+
 resource "azurerm_logic_app_action_http" "example" {
   name         = "webhook"
   logic_app_id = azurerm_logic_app_workflow.example.id
@@ -39,13 +55,6 @@ resource "azurerm_logic_app_action_http" "example" {
     "X-GitHub-Api-Version" : "2022-11-28"
   }
   uri = "https://api.github.com/repos/aruizcab/FinOps_AutoScaling/dispatches"
-}
-
-data "azapi_resource_action" "callback_url_data" {
-  type                   = "Microsoft.Web/sites/hostruntime/webhooks/api/workflows/triggers@2022-03-01"
-  action                 = "listCallbackUrl"
-  resource_id            = azurerm_logic_app_workflow.example.id
-  response_export_values = ["*"]
 }
 
 # Azure monitor metric alert to detect cpu usage limits
@@ -86,7 +95,7 @@ resource "azurerm_monitor_action_group" "vmss_action_group" {
   logic_app_receiver {
     name                    = azurerm_logic_app_workflow.example.name
     resource_id             = azurerm_logic_app_workflow.example.id
-    callback_url            = jsondecode(data.azapi_resource_action.callback_url_data.output).value
+    callback_url            = azurerm_logic_app_trigger_http_request.example.callback_url
     use_common_alert_schema = true
   }
 }
