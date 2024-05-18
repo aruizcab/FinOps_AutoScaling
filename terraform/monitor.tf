@@ -1,22 +1,22 @@
-# Key vault to store github token
-data "azurerm_key_vault_secret" "github_token" {
-  name         = "github-token"
-  key_vault_id = azurerm_key_vault.kv.id
-}
+# # Key vault to store github token
+# data "azurerm_key_vault_secret" "github_token" {
+#   name         = "github-token"
+#   key_vault_id = azurerm_key_vault.kv.id
+# }
 
-resource "azurerm_key_vault" "kv" {
-  name                = "github-token-kv"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-  sku_name            = "standard"
-  tenant_id           = data.azurerm_client_config.current.tenant_id
-}
+# resource "azurerm_key_vault" "kv" {
+#   name                = "github-token-kv"
+#   location            = azurerm_resource_group.rg.location
+#   resource_group_name = azurerm_resource_group.rg.name
+#   sku_name            = "standard"
+#   tenant_id           = data.azurerm_client_config.current.tenant_id
+# }
 
-resource "azurerm_key_vault_secret" "github_token" {
-  name         = "github-token"
-  value        = var.GH_TOKEN
-  key_vault_id = azurerm_key_vault.kv.id
-}
+# resource "azurerm_key_vault_secret" "github_token" {
+#   name         = "github-token"
+#   value        = var.GH_TOKEN
+#   key_vault_id = azurerm_key_vault.kv.id
+# }
 
 # logic app work to send api request to github
 resource "azurerm_logic_app_workflow" "example" {
@@ -30,11 +30,67 @@ resource "azurerm_logic_app_trigger_http_request" "example" {
   logic_app_id = azurerm_logic_app_workflow.example.id
 
   schema = <<SCHEMA
-{
+ {
     "type": "object",
     "properties": {
-        "hello": {
+        "schemaId": {
             "type": "string"
+        },
+        "data": {
+            "type": "object",
+            "properties": {
+                "essentials": {
+                    "type": "object",
+                    "properties": {
+                        "alertId": {
+                            "type": "string"
+                        },
+                        "alertRule": {
+                            "type": "string"
+                        },
+                        "severity": {
+                            "type": "string"
+                        },
+                        "signalType": {
+                            "type": "string"
+                        },
+                        "monitorCondition": {
+                            "type": "string"
+                        },
+                        "monitoringService": {
+                            "type": "string"
+                        },
+                        "alertTargetIDs": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "originAlertId": {
+                            "type": "string"
+                        },
+                        "firedDateTime": {
+                            "type": "string"
+                        },
+                        "resolvedDateTime": {
+                            "type": "string"
+                        },
+                        "description": {
+                            "type": "string"
+                        },
+                        "essentialsVersion": {
+                            "type": "string"
+                        },
+                        "alertContextVersion": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "alertContext": {
+                    "type": "object",
+                    "properties": {}
+                }
+            }
         }
     }
 }
@@ -51,7 +107,7 @@ resource "azurerm_logic_app_action_http" "example" {
   headers = {
     "Content-Type" = "application/json"
     "Accept" : "application/vnd.github+json"
-    "Authorization" : "Bearer ${data.azurerm_key_vault_secret.github_token.value}"
+    "Authorization" : "Bearer ${var.GH_TOKEN}"
     "X-GitHub-Api-Version" : "2022-11-28"
   }
   uri = "https://api.github.com/repos/aruizcab/FinOps_AutoScaling/dispatches"
@@ -93,8 +149,8 @@ resource "azurerm_monitor_action_group" "vmss_action_group" {
   # }
 
   logic_app_receiver {
-    name                    = azurerm_logic_app_workflow.example.name
-    resource_id             = azurerm_logic_app_workflow.example.id
+    name                    = azurerm_logic_app_trigger_http_request.example.name
+    resource_id             = azurerm_logic_app_trigger_http_request.example.id
     callback_url            = azurerm_logic_app_trigger_http_request.example.callback_url
     use_common_alert_schema = true
   }
