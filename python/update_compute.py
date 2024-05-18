@@ -22,7 +22,7 @@ def main():
 
 def obtain_new_config(config):
     # Calculates new number of vms
-    if (config["n_vms"] > config["n_vms_min"]) and (config["n_vms"] < config["n_vms_mmax"]):
+    if (config["n_vms"] > config["n_vms_min"]) and (config["n_vms"] < config["n_vms_max"]):
         if (sys.argv[0] == "increment_vm"):
             n_vms_new = config["n_vms"] + 1
         elif (sys.argv[0] == "reduce_vm"):
