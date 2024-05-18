@@ -14,7 +14,7 @@ def main():
 
     # Saves changes in config.json
     with open("./python/config.json", "w") as config_json:
-        json.dump(config_json)
+        json.dump(config, config_json)
 
     # Saves changes in compute.tf
     with open("./terraform/compute.tf", "w") as compute_tf:
