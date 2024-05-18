@@ -1,0 +1,53 @@
+name: 'Terraform Update'
+ 
+# on:
+#   repository_dispatch:
+#     types: [reduce-n-vms]
+on:
+  [workflow_dispatch]
+ 
+jobs:
+  terraform:
+    name: 'Terraform Create'
+    env:
+      ARM_CLIENT_ID: ${{ secrets.AZURE_AD_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.AZURE_AD_CLIENT_SECRET }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ secrets.AZURE_AD_TENANT_ID }}
+      TF_VERSION: 1.5.7
+      TF_VAR_PUB_KEY: ${{ secrets.PUB_KEY }}
+      TF_VAR_GH_TOKEN: ${{ secrets.GH_TOKEN }}
+    runs-on: ubuntu-latest
+    environment: production
+ 
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    # Checkout the repository to the GitHub Actions runner
+    - name: checkout
+      uses: actions/checkout@v1
+
+    # Modify compute.tf and config.json files
+    - name: Run update_compute.py script
+      run: python ./python/update_compute.py reduce_vm
+
+    - name: switching from HTTPS to SSH
+      run: git remote set-url origin https://github.com/aruizcab/FinOps_AutoScaling.git
+
+    - name: check for changes
+      run: git status
+      
+    - name: stage changed files
+      run: git add .
+
+    - name: commit changed files
+      run: git commit -m "Auto updating compute.tf"
+
+    - name: fetch from main
+      run: git fetch origin main
+
+    - name: push code to main
+      run: git push origin HEAD:main
