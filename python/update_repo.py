@@ -32,7 +32,7 @@ element_list = list()
 for i, entry in enumerate(file_list):
     with open(entry) as input_file:
         data = input_file.read()
-    element = InputGitTreeElement(file_names[i], '100644', 'blob', data)
+    element = InputGitTreeElement(file_list[i], '100644', 'blob', data)
     element_list.append(element)
 
 tree = repo.create_git_tree(element_list, base_tree)

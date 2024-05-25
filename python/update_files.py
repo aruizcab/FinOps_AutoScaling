@@ -2,12 +2,13 @@ import json
 import sys
 
 def main():
+    action = sys.argv[0]
     # Read config.json
     with open("python/config.json", "r") as config_json:
         config = json.load(config_json)
 
     # Calculates new number of vms
-    config["n_vms"] = obtain_new_config(config)
+    config["n_vms"] = obtain_new_config(config, action)
 
     # Generates new content of compute.tf
     compute_tf_content = generate_compute_file(config["n_vms"], config["sku"])
@@ -20,12 +21,12 @@ def main():
     with open("terraform/compute.tf", "w") as compute_tf:
         compute_tf.write(compute_tf_content)
 
-def obtain_new_config(config):
+def obtain_new_config(config, action):
     # Calculates new number of vms
     if (config["n_vms"] > config["n_vms_min"]) and (config["n_vms"] < config["n_vms_max"]):
-        if (sys.argv[0] == "increment_vm"):
+        if (action == "increment_vm"):
             n_vms_new = config["n_vms"] + 1
-        elif (sys.argv[0] == "reduce_vm"):
+        elif (action == "reduce_vm"):
             n_vms_new = config["n_vms"] - 1
         else:
             return config["n_vms"]
