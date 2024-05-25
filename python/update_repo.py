@@ -1,4 +1,3 @@
-import base64
 from github import Github
 from github import InputGitTreeElement
 import os
