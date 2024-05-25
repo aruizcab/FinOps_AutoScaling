@@ -32,7 +32,7 @@ jobs:
 
     # Modify compute.tf and config.json files
     - name: Run update_files.py script
-      run: python ./python/update_compute.py reduce_vm
+      run: python ./python/update_files.py reduce_vm
 
     # Update github repository
     - name: Run update_compute.py script
