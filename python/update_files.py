@@ -3,7 +3,7 @@ import sys
 
 def main():
     # Read config.json
-    with open("./python/config.json", "r") as config_json:
+    with open("python/config.json", "r") as config_json:
         config = json.load(config_json)
 
     # Calculates new number of vms
@@ -13,11 +13,11 @@ def main():
     compute_tf_content = generate_compute_file(config["n_vms"], config["sku"])
 
     # Saves changes in config.json
-    with open("./python/config.json", "w") as config_json:
+    with open("python/config.json", "w") as config_json:
         json.dump(config, config_json)
 
     # Saves changes in compute.tf
-    with open("./terraform/compute.tf", "w") as compute_tf:
+    with open("terraform/compute.tf", "w") as compute_tf:
         compute_tf.write(compute_tf_content)
 
 def obtain_new_config(config):

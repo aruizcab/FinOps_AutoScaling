@@ -13,8 +13,8 @@ repo = "FinOps_AutoScaling"                         # repository name
 # repo = os.environ["REPOSITORY"]                     # repository name
 target_branch = "main"                              # branch to update
 file_list = [                                      # list with the paths of the files that will be updated
-    "./python/config.json",
-    "./terraform/compute.tf"
+    "python/config.json",
+    "terraform/compute.tf"
 ]
 file_names = [
     'config.json',
