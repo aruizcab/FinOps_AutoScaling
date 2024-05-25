@@ -1,8 +1,9 @@
 import json
 import sys
+import os
 
 def main():
-    action = sys.argv[0]
+    action = os.environ["ACTION"]
     # Read config.json
     with open("python/config.json", "r") as config_json:
         config = json.load(config_json)
@@ -42,10 +43,9 @@ resource "azurerm_orchestrated_virtual_machine_scale_set" "vmss_terraform_tfm" {
   resource_group_name         = azurerm_resource_group.rg.name
   location                    = azurerm_resource_group.rg.location
 '''
-    compute_file_2 =f'''
-  sku_name                    = {sku_new}
-  instances                   = {n_vms_new}
-'''
+    compute_file_2 =f''' sku_name = {sku_new}
+  instances = {n_vms_new}'''
+    
     compute_file_3 = '''
   platform_fault_domain_count = 1     # For zonal deployments, this must be set to 1
   zones                       = ["1"] # Zones required to lookup zone in the startup script
@@ -96,8 +96,7 @@ resource "azurerm_orchestrated_virtual_machine_scale_set" "vmss_terraform_tfm" {
       instances
     ]
   }
-}
-'''
+}'''
     return compute_file_1 + compute_file_2 + compute_file_3
 
 # Update compute.tf
