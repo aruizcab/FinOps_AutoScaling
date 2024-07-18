@@ -47,11 +47,4 @@ resource "azurerm_orchestrated_virtual_machine_scale_set" "vmss_terraform_tfm" {
   boot_diagnostics {
     storage_account_uri = ""
   }
-
-  # Ignore changes to the instances property, so that the VMSS is not recreated when the number of instances is changed
-  lifecycle {
-    ignore_changes = [
-      instances
-    ]
-  }
 }
