@@ -35,17 +35,14 @@ def obtain_new_config(config, action):
         return config["n_vms"]
     
 def generate_compute_file(n_vms_new, sku_new):
-    # Generates new content of compute.tf
-    compute_file_1 = '''
+    # Generates new content of compute.tf  
+    compute_file = f'''
 resource "azurerm_orchestrated_virtual_machine_scale_set" "vmss_terraform_tfm" {
   name                        = "vmss-terraform"
   resource_group_name         = azurerm_resource_group.rg.name
   location                    = azurerm_resource_group.rg.location
-'''
-    compute_file_2 =f'''  sku_name = \"{sku_new}\"
-  instances = {n_vms_new}'''
-    
-    compute_file_3 = '''
+  sku_name                    = \"{sku_new}\"
+  instances                   = {n_vms_new}
   platform_fault_domain_count = 1     # For zonal deployments, this must be set to 1
   zones                       = ["1"] # Zones required to lookup zone in the startup script
 
@@ -89,7 +86,7 @@ resource "azurerm_orchestrated_virtual_machine_scale_set" "vmss_terraform_tfm" {
     storage_account_uri = ""
   }
 }'''
-    return compute_file_1 + compute_file_2 + compute_file_3
+    return compute_file
 
 # Update compute.tf
 if __name__=="__main__":
