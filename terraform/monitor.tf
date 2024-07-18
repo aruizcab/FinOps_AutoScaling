@@ -102,7 +102,7 @@ SCHEMA
 }
 
 resource "azurerm_logic_app_action_http" "reduce_vm" {
-  name         = "webhook"
+  name         = "webhook_reduce"
   logic_app_id = azurerm_logic_app_workflow.reduce_vm.id
   method       = "POST"
   body = jsonencode({
@@ -119,7 +119,7 @@ resource "azurerm_logic_app_action_http" "reduce_vm" {
 
 # Azure monitor metric alert to detect cpu usage limits
 resource "azurerm_monitor_metric_alert" "low_cpu_alert" {
-  name                = "vmss-cpu-alert"
+  name                = "vmss-low-cpu-alert"
   resource_group_name = azurerm_resource_group.rg.name
   scopes              = [azurerm_orchestrated_virtual_machine_scale_set.vmss_terraform_tfm.id]
   description         = "Alert when VMSS CPU usage is below 10%"
@@ -142,9 +142,9 @@ resource "azurerm_monitor_metric_alert" "low_cpu_alert" {
 }
 
 resource "azurerm_monitor_action_group" "reduce_vm" {
-  name                = "vmss-action-group"
+  name                = "vmss-action-group-reduce"
   resource_group_name = azurerm_resource_group.rg.name
-  short_name          = "vmss-ag"
+  short_name          = "vmss-ag-r"
 
   logic_app_receiver {
     name                    = azurerm_logic_app_trigger_http_request.reduce_vm.name
@@ -238,7 +238,7 @@ SCHEMA
 }
 
 resource "azurerm_logic_app_action_http" "increase_vm" {
-  name         = "webhook"
+  name         = "webhook_increase"
   logic_app_id = azurerm_logic_app_workflow.increase_vm.id
   method       = "POST"
   body = jsonencode({
@@ -255,7 +255,7 @@ resource "azurerm_logic_app_action_http" "increase_vm" {
 
 # Azure monitor metric alert to detect cpu usage limits
 resource "azurerm_monitor_metric_alert" "high_cpu_alert" {
-  name                = "vmss-cpu-alert"
+  name                = "vmss-high-cpu-alert"
   resource_group_name = azurerm_resource_group.rg.name
   scopes              = [azurerm_orchestrated_virtual_machine_scale_set.vmss_terraform_tfm.id]
   description         = "Alert when VMSS CPU usage is above 90%"
@@ -278,9 +278,9 @@ resource "azurerm_monitor_metric_alert" "high_cpu_alert" {
 }
 
 resource "azurerm_monitor_action_group" "increase_vm" {
-  name                = "vmss-action-group"
+  name                = "vmss-action-group-increase"
   resource_group_name = azurerm_resource_group.rg.name
-  short_name          = "vmss-ag"
+  short_name          = "vmss-ag-i"
 
   logic_app_receiver {
     name                    = azurerm_logic_app_trigger_http_request.increase_vm.name
