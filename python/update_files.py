@@ -42,7 +42,7 @@ resource "azurerm_orchestrated_virtual_machine_scale_set" "vmss_terraform_tfm" {
   resource_group_name         = azurerm_resource_group.rg.name
   location                    = azurerm_resource_group.rg.location
 '''
-    compute_file_2 =f'''  sku_name = {sku_new}
+    compute_file_2 =f'''  sku_name = \"{sku_new}\"
   instances = {n_vms_new}'''
     
     compute_file_3 = '''
