@@ -119,7 +119,7 @@ resource "azurerm_logic_app_action_http" "reduce_vm" {
 
 # Azure monitor metric alert to detect cpu usage limits
 resource "azurerm_monitor_metric_alert" "low_cpu_alert" {
-  name                = "vmss-cpu-alert"
+  name                = "vmss-low-cpu-alert"
   resource_group_name = azurerm_resource_group.rg.name
   scopes              = [azurerm_orchestrated_virtual_machine_scale_set.vmss_terraform_tfm.id]
   description         = "Alert when VMSS CPU usage is below 10%"
@@ -255,7 +255,7 @@ resource "azurerm_logic_app_action_http" "increase_vm" {
 
 # Azure monitor metric alert to detect cpu usage limits
 resource "azurerm_monitor_metric_alert" "high_cpu_alert" {
-  name                = "vmss-cpu-alert"
+  name                = "vmss-high-cpu-alert"
   resource_group_name = azurerm_resource_group.rg.name
   scopes              = [azurerm_orchestrated_virtual_machine_scale_set.vmss_terraform_tfm.id]
   description         = "Alert when VMSS CPU usage is above 90%"
