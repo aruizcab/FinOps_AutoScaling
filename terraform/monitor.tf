@@ -133,7 +133,7 @@ resource "azurerm_monitor_metric_alert" "low_cpu_alert" {
     metric_name      = "Percentage CPU"
     aggregation      = "Average"
     operator         = "LessThan"
-    threshold        = 10
+    threshold        = 20
   }
 
   action {
@@ -269,7 +269,7 @@ resource "azurerm_monitor_metric_alert" "high_cpu_alert" {
     metric_name      = "Percentage CPU"
     aggregation      = "Average"
     operator         = "GreaterThan"
-    threshold        = 90
+    threshold        = 80
   }
 
   action {
