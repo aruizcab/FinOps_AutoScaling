@@ -18,16 +18,20 @@
 #   key_vault_id = azurerm_key_vault.kv.id
 # }
 
-# logic app work to send api request to github
-resource "azurerm_logic_app_workflow" "example" {
-  name                = "workflow1"
+# logic app to send api request to github when low cpu usage
+
+
+
+# Resources used to monitor cpu-usage and reduce number of vms
+resource "azurerm_logic_app_workflow" "reduce_vm" {
+  name                = "workflow_reduce_vm"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
 }
 
-resource "azurerm_logic_app_trigger_http_request" "example" {
-  name         = "some-http-trigger"
-  logic_app_id = azurerm_logic_app_workflow.example.id
+resource "azurerm_logic_app_trigger_http_request" "reduce_vm" {
+  name         = "http-trigger-reduce-vm"
+  logic_app_id = azurerm_logic_app_workflow.reduce_vm.id
 
   schema = <<SCHEMA
  {
@@ -97,9 +101,9 @@ resource "azurerm_logic_app_trigger_http_request" "example" {
 SCHEMA
 }
 
-resource "azurerm_logic_app_action_http" "example" {
-  name         = "webhook"
-  logic_app_id = azurerm_logic_app_workflow.example.id
+resource "azurerm_logic_app_action_http" "reduce_vm" {
+  name         = "webhook_reduce"
+  logic_app_id = azurerm_logic_app_workflow.reduce_vm.id
   method       = "POST"
   body = jsonencode({
     event_type = "reduce-n-vms"
@@ -114,15 +118,15 @@ resource "azurerm_logic_app_action_http" "example" {
 }
 
 # Azure monitor metric alert to detect cpu usage limits
-resource "azurerm_monitor_metric_alert" "vmss_cpu_alert" {
-  name                = "vmss-cpu-alert"
+resource "azurerm_monitor_metric_alert" "low_cpu_alert" {
+  name                = "vmss-low-cpu-alert"
   resource_group_name = azurerm_resource_group.rg.name
   scopes              = [azurerm_orchestrated_virtual_machine_scale_set.vmss_terraform_tfm.id]
-  description         = "Alert when VMSS CPU usage exceeds 80%"
+  description         = "Alert when VMSS CPU usage is below 10%"
   severity            = 2
   enabled             = true
-  frequency           = "PT1M" # Evaluar cada 5 minutos
-  window_size         = "PT5M" # Período de 1 minutos para calcular el promedio
+  frequency           = "PT1M" # Evaluar cada 1 minutos
+  window_size         = "PT1M" # Período de 1 minutos para calcular el promedio
 
   criteria {
     metric_namespace = "Microsoft.Compute/virtualMachineScalesets"
@@ -133,43 +137,155 @@ resource "azurerm_monitor_metric_alert" "vmss_cpu_alert" {
   }
 
   action {
-    action_group_id = azurerm_monitor_action_group.vmss_action_group.id
+    action_group_id = azurerm_monitor_action_group.reduce_vm.id
   }
 }
 
-resource "azurerm_monitor_action_group" "vmss_action_group" {
-  name                = "vmss-action-group"
+resource "azurerm_monitor_action_group" "reduce_vm" {
+  name                = "vmss-action-group-reduce"
   resource_group_name = azurerm_resource_group.rg.name
-  short_name          = "vmss-ag"
-
-  # webhook_receiver {
-  #   name        = "github-webhook"
-  #   service_uri = "https://api.github.com/repos/aruizcab/FinOps_AutoScaling/dispatches?access_token=${var.GH_TOKEN}"
-  #   # Configura los encabezados y la carga útil según tus necesidades
-  # }
+  short_name          = "vmss-ag-r"
 
   logic_app_receiver {
-    name                    = azurerm_logic_app_trigger_http_request.example.name
-    resource_id             = azurerm_logic_app_trigger_http_request.example.id
-    callback_url            = azurerm_logic_app_trigger_http_request.example.callback_url
+    name                    = azurerm_logic_app_trigger_http_request.reduce_vm.name
+    resource_id             = azurerm_logic_app_trigger_http_request.reduce_vm.id
+    callback_url            = azurerm_logic_app_trigger_http_request.reduce_vm.callback_url
     use_common_alert_schema = true
   }
 }
 
-# resource "azurerm_logic_app_action_http_request" "github_api_call" {
-#   name         = "github-api-call"
-#   logic_app_id = azurerm_logic_app_workflow.logic_app.id
-#   method       = "POST"
-#   uri          = "https://api.github.com/repos/YOUR_REPO/dispatches"
-#   body         = jsonencode({
-#     event_type = "cpu-high-event"
-#     client_payload = {
-#       message = "CPU high alert triggered"
-#     }
-#   })
-#   headers = {
-#     "Content-Type" = "application/json"
-#     "Authorization" = "Bearer ${data.azurerm_key_vault_secret.github_token.value}"
-#   }
-# }
 
+
+
+
+# Resources used to monitor cpu-usage and reduce number of vms
+resource "azurerm_logic_app_workflow" "increase_vm" {
+  name                = "workflow_increase_vm"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+}
+
+resource "azurerm_logic_app_trigger_http_request" "increase_vm" {
+  name         = "http-trigger-increase-vm"
+  logic_app_id = azurerm_logic_app_workflow.increase_vm.id
+
+  schema = <<SCHEMA
+ {
+    "type": "object",
+    "properties": {
+        "schemaId": {
+            "type": "string"
+        },
+        "data": {
+            "type": "object",
+            "properties": {
+                "essentials": {
+                    "type": "object",
+                    "properties": {
+                        "alertId": {
+                            "type": "string"
+                        },
+                        "alertRule": {
+                            "type": "string"
+                        },
+                        "severity": {
+                            "type": "string"
+                        },
+                        "signalType": {
+                            "type": "string"
+                        },
+                        "monitorCondition": {
+                            "type": "string"
+                        },
+                        "monitoringService": {
+                            "type": "string"
+                        },
+                        "alertTargetIDs": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "originAlertId": {
+                            "type": "string"
+                        },
+                        "firedDateTime": {
+                            "type": "string"
+                        },
+                        "resolvedDateTime": {
+                            "type": "string"
+                        },
+                        "description": {
+                            "type": "string"
+                        },
+                        "essentialsVersion": {
+                            "type": "string"
+                        },
+                        "alertContextVersion": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "alertContext": {
+                    "type": "object",
+                    "properties": {}
+                }
+            }
+        }
+    }
+}
+SCHEMA
+}
+
+resource "azurerm_logic_app_action_http" "increase_vm" {
+  name         = "webhook_increase"
+  logic_app_id = azurerm_logic_app_workflow.increase_vm.id
+  method       = "POST"
+  body = jsonencode({
+    event_type = "increase-n-vms"
+  })
+  headers = {
+    "Content-Type" = "application/json"
+    "Accept" : "application/vnd.github+json"
+    "Authorization" : "Bearer ${var.GH_TOKEN}"
+    "X-GitHub-Api-Version" : "2022-11-28"
+  }
+  uri = "https://api.github.com/repos/aruizcab/FinOps_AutoScaling/dispatches"
+}
+
+# Azure monitor metric alert to detect cpu usage limits
+resource "azurerm_monitor_metric_alert" "high_cpu_alert" {
+  name                = "vmss-high-cpu-alert"
+  resource_group_name = azurerm_resource_group.rg.name
+  scopes              = [azurerm_orchestrated_virtual_machine_scale_set.vmss_terraform_tfm.id]
+  description         = "Alert when VMSS CPU usage is above 90%"
+  severity            = 2
+  enabled             = true
+  frequency           = "PT1M" # Evaluar cada 1 minutos
+  window_size         = "PT1M" # Período de 1 minutos para calcular el promedio
+
+  criteria {
+    metric_namespace = "Microsoft.Compute/virtualMachineScalesets"
+    metric_name      = "Percentage CPU"
+    aggregation      = "Average"
+    operator         = "GreaterThan"
+    threshold        = 80
+  }
+
+  action {
+    action_group_id = azurerm_monitor_action_group.increase_vm.id
+  }
+}
+
+resource "azurerm_monitor_action_group" "increase_vm" {
+  name                = "vmss-action-group-increase"
+  resource_group_name = azurerm_resource_group.rg.name
+  short_name          = "vmss-ag-i"
+
+  logic_app_receiver {
+    name                    = azurerm_logic_app_trigger_http_request.increase_vm.name
+    resource_id             = azurerm_logic_app_trigger_http_request.increase_vm.id
+    callback_url            = azurerm_logic_app_trigger_http_request.increase_vm.callback_url
+    use_common_alert_schema = true
+  }
+}
